@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: redrob
+      POSTGRES_USER: redrob
+      POSTGRES_PASSWORD: redrob_secret_2024
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U redrob"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://redrob:redrob_secret_2024@postgres:5432/redrob
+      SECRET_KEY: redrob-production-secret-change-me-abc123xyz
+      CORS_ORIGINS: "http://localhost,http://localhost:80,http://frontend"
+      RANKED_RESULTS_PATH: /data/ranked_results.json
+    volumes:
+      - ../redrob_ranker/outputs:/data:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+
+volumes:
+  pgdata:

@@ -1,0 +1,97 @@
+# Redrob Hackathon — Submission Metadata
+# Redrob TalentAI Platform + Candidate Ranker
+
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "redrob-talentai"
+
+primary_contact:
+  name: "Pavan Pradeep"
+  email: "kattuboogie@gmail.com"
+  phone: "+91-XXXXXXXXXX"
+
+team_members:
+  - name: "Pavan Pradeep"
+    email: "kattuboogie@gmail.com"
+    role: "Team Lead / Full-Stack AI Engineer"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/YOUR_USERNAME/redrob-talentai"
+# Replace YOUR_USERNAME with your actual GitHub username before submission
+
+sandbox_link: "https://huggingface.co/spaces/YOUR_USERNAME/redrob-ranker"
+# Replace with actual deployed link
+
+reproduce_command: "python -m src.run --candidates ./data/candidates.jsonl --out ./outputs/submission.csv"
+# Run from redrob_ranker/ directory. Produces 100-row CSV in ~25s on CPU.
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "MacBook Pro"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.11"
+  os: "macOS"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Claude"
+
+ai_usage_summary: |
+  Claude used for code review, architectural discussion, and development workflow.
+  No candidate data was fed to any LLM during the ranking step.
+  The ranking pipeline runs entirely offline with local rule-based scoring and
+  optional sentence-transformers embedding (all-MiniLM-L6-v2, runs on CPU).
+
+# ============================================================================
+# Approach summary
+# ============================================================================
+methodology_summary: |
+  Hybrid multi-signal ranking pipeline in two stages:
+
+  Stage 1 — Rule-based scoring for all 100K candidates (< 25s on CPU):
+    - Skills match (0.28): Weighted overlap of required/nice-to-have skills with
+      proficiency and duration-months as trust multipliers to defeat keyword stuffers
+    - Title/Role relevance (0.22): Pattern-matched against 30+ title archetypes
+      (weighted 70% current + 30% best historical)
+    - Career trajectory (0.18): Product vs. consulting company ratio, production ML
+      signals in descriptions, career arc and tenure analysis
+    - Behavioral signals (0.14): open_to_work flag, last-active recency, recruiter
+      response rate, notice period, GitHub activity score
+    - Experience fit (0.13): Bell-curve peaking at JD sweet spot of 6-8 years
+      multiplied by domain relevance ratio
+    - Education prestige (0.05): Institution tier × degree level × STEM field
+
+  Stage 2 — Semantic similarity (optional, < 10s): Sentence-transformers
+  all-MiniLM-L6-v2 applied to top-3000 rule-scored candidates only.
+
+  Final score = weighted_sum × behavioral_multiplier × (1 - honeypot_penalty)
+  where behavioral_multiplier down-weights inactive/unresponsive candidates and
+  honeypot_penalty flags impossible profiles (expert skills with 0 duration months,
+  claimed years of experience >> verifiable career history).
+
+  Key design decisions from JD hints: keyword stuffing is explicitly penalized,
+  consulting-only careers receive trajectory penalty, non-NLP domains are
+  down-weighted, and a perfect-on-paper candidate who is behaviorally unavailable
+  is ranked lower than a slightly weaker but actively engaged candidate.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
