@@ -17,9 +17,6 @@ Built for the **Redrob Intelligent Candidate Discovery & Ranking Challenge 2026*
 
 ---
 
-## Demo Video
-
-[Watch Demo Video](docs/Demovideo.mp4)
 
 ---
 
@@ -29,34 +26,9 @@ Built for the **Redrob Intelligent Candidate Discovery & Ranking Challenge 2026*
 
 ### System Overview
 
-```
-  FRONTEND  (React 18 + TypeScript + Vite)
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  Dashboard  │  Candidates  │  Pipeline  │  Analytics  │  Jobs   │
-  │  Compare    │  Admin       │  ⌘K Palette│  Auth       │         │
-  │                                                                  │
-  │  React Query (server cache) + Zustand + AuthContext             │
-  │  Tailwind CSS + Material Symbols + Recharts + @dnd-kit           │
-  └──────────────────────────┬──────────────────────────────────────┘
-                             │  Axios (JWT Bearer, auto-refresh on 401)
-                             ▼
-  BACKEND  (FastAPI + Python 3.10)
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  auth.py │ candidates.py │ jobs.py │ analytics.py │ users.py    │
-  │                                                                  │
-  │  gemini.py — _call_gemini(), generate_kit_ai(), ai_search(),    │
-  │              analyze_jd(), fit_analysis(), draft_email(),       │
-  │              summarize_notes()                                   │
-  │                                                                  │
-  │  SQLAlchemy ORM: candidates ── shortlists ── jobs               │
-  │                              candidate_notes ── users           │
-  └──────────────────────────┬──────────────────────────────────────┘
-                             │
-              ┌──────────────┴──────────────┐
-              │                             │
-       SQLite (dev)              Gemini 2.5 Flash Lite
-       PostgreSQL (prod)         (REST API via httpx)
-```
+![Architecture Diagram](docs/screenshots/overview.png)
+
+
 
 ---
 
